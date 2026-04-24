@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    actor Courier as Курьер
+    participant GW as API Gateway
+    participant DS as Delivery Service
+    participant Redis as Redis (Location Cache)
+    actor Client as Клиент
+
+    Note over Client, DS: Установка WSS соединения
+    Client->>GW: WSS /ws/track/{order_id}
+    GW->>DS: Upgrade to WebSocket
+    DS-->>Client: Connection Established
+    
+    Note over Courier, Client: Регулярное обновление геопозиции (каждые 5-10 сек)
+    loop Пока заказ доставляется
+        Courier->>GW: POST /api/v1/courier/location (lat, lon)
+        GW->>DS: Обновить геопозицию
+        DS->>Redis: SET geo:order_id (lat, lon)
+        Note over DS, Client: Delivery Service пушит данные во все активные сокеты
+        DS->>Client: WebSocket Push: {lat, lon, ETA: "5 min"}
+    end
+    
+    Courier->>GW: POST /api/v1/courier/status (DELIVERED)
+    GW->>DS: Обновить статус
+    DS->>Client: WebSocket Push: {status: "DELIVERED"}
+    DS--xClient: WSS Connection Closed

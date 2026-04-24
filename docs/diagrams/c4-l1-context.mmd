@@ -1,0 +1,28 @@
+C4Context
+    title System Context Diagram - Food Delivery Platform
+
+    Person(customer, "Клиент", "Ищет еду, оформляет заказ, отслеживает доставку.")
+    Person(courier, "Курьер", "Принимает заказы, транслирует свои GPS-координаты и доставляет еду.")
+    Person(restaurant, "Менеджер ресторана", "Управляет меню, ценами и принимает заказы в готовку.")
+
+    Enterprise_Boundary(our_company, "Food Delivery Company") {
+        System(fds, "Food Delivery System", "Центральная платформа. Маршрутизирует заказы, координирует участников и управляет финансовыми потоками.")
+    }
+
+    Boundary(ext_services, "Внешние сервисы и провайдеры") {
+        System_Ext(payment_gateway, "Payment Gateway", "Внешний платежный шлюз (Stripe / CloudPayments). Обрабатывает холдирование и списания.")
+        System_Ext(notification_svc, "Notification Provider", "Внешний сервис (Firebase / Twilio). Управляет отправкой Push-уведомлений и SMS.")
+        System_Ext(geo_api, "Geo/Maps API", "Внешнее API (Google / 2GIS) для геокодинга и расчета времени в пути (ETA).")
+    }
+
+    
+    BiRel(customer, fds, "Оформляет заказы / Получает статусы", "HTTPS / WSS")
+    BiRel(courier, fds, "Берет заказы / Передает координаты", "HTTPS / WSS")
+    BiRel(restaurant, fds, "Управляет меню / Принимает заказы", "HTTPS")
+
+    BiRel(fds, payment_gateway, "Инициирует оплаты / Получает Webhooks", "REST API")
+    BiRel(fds, geo_api, "Запрашивает маршруты / Получает ETA", "REST API")
+    Rel(fds, notification_svc, "Генерирует события для рассылки", "REST API")
+
+    Rel(notification_svc, customer, "Доставляет Push / SMS", "Mobile Network")
+    Rel(notification_svc, courier, "Доставляет Push / SMS", "Mobile Network")

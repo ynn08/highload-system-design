@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    actor Client as Клиент
+    participant GW as API Gateway
+    participant OS as Order Service
+    participant DB as Postgres (Orders)
+    participant Kafka as Message Broker
+    participant PS as Payment Service
+    participant ExtPay as Payment Gateway
+
+    Client->>GW: POST /api/v1/orders (корзина, адрес)
+    GW->>OS: Перенаправление запроса
+    OS->>DB: Сохранить заказ (Status: PENDING)
+    DB-->>OS: Заказ сохранен (order_id)
+    OS->>Kafka: Publish Event: [OrderCreated]
+    OS-->>GW: HTTP 201 Created (order_id, status: PENDING)
+    GW-->>Client: Заказ принят в обработку (p99 < 200ms)
+    
+    note over Kafka, ExtPay: Асинхронная обработка оплаты (Saga)
+    
+    Kafka-->>PS: Consume Event: [OrderCreated]
+    PS->>ExtPay: POST /charge (Списание средств)
+    ExtPay-->>PS: 200 OK (Оплата успешна)
+    PS->>Kafka: Publish Event: [PaymentSuccess]
+    
+    Kafka-->>OS: Consume Event: [PaymentSuccess]
+    OS->>DB: Обновить статус заказа (Status: PAID)
+    OS->>Kafka: Publish Event: [OrderPaid] (для ресторана)
