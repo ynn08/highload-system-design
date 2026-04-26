@@ -1,0 +1,42 @@
+# .gitignore for the whole monorepo
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go
+bin/
+pkg/
+vendor/
+catalog-service/main
+api-gateway/main
+payment-service/main
+
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+
+# Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Docker
+.docker/
