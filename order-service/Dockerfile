@@ -1,12 +1,14 @@
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
+FROM golang:alpine AS builder
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
-COPY src ./src
-RUN mvn package -DskipTests
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go mod tidy
+RUN go build -o main .
 
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+FROM alpine:latest
+WORKDIR /root/
+COPY --from=builder /app/main .
+COPY --from=builder /app/migrations ./migrations
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["./main"]

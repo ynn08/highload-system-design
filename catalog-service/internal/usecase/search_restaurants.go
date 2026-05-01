@@ -33,7 +33,7 @@ func (u *SearchRestaurantsUseCase) Execute(ctx context.Context, input SearchInpu
 		return SearchOutput{}, err
 	}
 
-	// Non-trivial logic: Ranking and Exact Distance Calculation
+	// Ranking and Exact Distance Calculation
 	for i := range restaurants {
 		dist := haversine(input.Lat, input.Lon, restaurants[i].Location.Lat, restaurants[i].Location.Lon)
 		restaurants[i].DistanceMeters = int(dist)

@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/user/highload-system-design/catalog-service/internal/domain"
 	"github.com/user/highload-system-design/catalog-service/internal/usecase"
 	"net/http"
 	"strconv"
@@ -10,10 +11,19 @@ import (
 type RestaurantHandler struct {
 	searchUseCase  *usecase.SearchRestaurantsUseCase
 	getMenuUseCase *usecase.GetRestaurantMenuUseCase
+	saveUseCase    *usecase.SaveRestaurantUseCase
 }
 
-func NewRestaurantHandler(searchUseCase *usecase.SearchRestaurantsUseCase, getMenuUseCase *usecase.GetRestaurantMenuUseCase) *RestaurantHandler {
-	return &RestaurantHandler{searchUseCase: searchUseCase, getMenuUseCase: getMenuUseCase}
+func NewRestaurantHandler(
+	searchUseCase *usecase.SearchRestaurantsUseCase,
+	getMenuUseCase *usecase.GetRestaurantMenuUseCase,
+	saveUseCase *usecase.SaveRestaurantUseCase,
+) *RestaurantHandler {
+	return &RestaurantHandler{
+		searchUseCase:  searchUseCase,
+		getMenuUseCase: getMenuUseCase,
+		saveUseCase:    saveUseCase,
+	}
 }
 
 func (h *RestaurantHandler) Search(c *gin.Context) {
@@ -64,4 +74,24 @@ func (h *RestaurantHandler) GetMenu(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, menu)
+}
+
+func (h *RestaurantHandler) Save(c *gin.Context) {
+	var restaurant domain.Restaurant
+	if err := h.ShouldBindJSON(c, &restaurant); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.saveUseCase.Execute(c.Request.Context(), restaurant); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusCreated)
+}
+
+// ShouldBindJSON is a helper to bind JSON
+func (h *RestaurantHandler) ShouldBindJSON(c *gin.Context, obj interface{}) error {
+	return c.ShouldBindJSON(obj)
 }

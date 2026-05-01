@@ -45,6 +45,8 @@ func (r *RestaurantRepository) Search(ctx context.Context, lat, lon float64, rad
 		var res domain.Restaurant
 		if err := json.Unmarshal(hit.Source, &res); err == nil {
 			restaurants = append(restaurants, res)
+		} else {
+			fmt.Printf("Unmarshal error: %v\n", err)
 		}
 	}
 
@@ -72,6 +74,7 @@ func (r *RestaurantRepository) Save(ctx context.Context, restaurant domain.Resta
 		Index(r.index).
 		Id(restaurant.ID).
 		BodyJson(restaurant).
+		Refresh("true").
 		Do(ctx)
 	return err
 }

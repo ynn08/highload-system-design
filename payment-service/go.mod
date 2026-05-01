@@ -1,11 +1,15 @@
 module github.com/user/highload-system-design/payment-service
 
-go 1.23.1
+go 1.24.0
 
 require (
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/klauspost/compress v1.15.9 // indirect
-	github.com/lib/pq v1.12.3 // indirect
-	github.com/pierrec/lz4/v4 v4.1.15 // indirect
-	github.com/segmentio/kafka-go v0.4.51 // indirect
+	github.com/google/uuid v1.6.0
+	github.com/lib/pq v1.12.3
+	github.com/segmentio/kafka-go v0.4.51
+)
+
+require (
+	github.com/golang-migrate/migrate/v4 v4.19.1 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/pierrec/lz4/v4 v4.1.16 // indirect
 )

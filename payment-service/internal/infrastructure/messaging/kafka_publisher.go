@@ -22,9 +22,9 @@ func NewKafkaPublisher(brokers []string, topic string) *KafkaPublisher {
 
 func (p *KafkaPublisher) PublishPaymentProcessed(ctx context.Context, orderID string, restaurantID string, status string) error {
 	msg := map[string]string{
-		"orderId":      orderID,
-		"restaurantId": restaurantID,
-		"status":       status,
+		"order_id":      orderID,
+		"restaurant_id": restaurantID,
+		"status":        status,
 	}
 	bytes, _ := json.Marshal(msg)
 	return p.writer.WriteMessages(ctx, kafka.Message{

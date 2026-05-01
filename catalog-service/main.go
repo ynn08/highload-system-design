@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/olivere/elastic/v7"
+	"github.com/user/highload-system-design/catalog-service/internal/domain"
 	"github.com/user/highload-system-design/catalog-service/internal/infrastructure/elasticsearch"
 	"github.com/user/highload-system-design/catalog-service/internal/interface/http"
 	"github.com/user/highload-system-design/catalog-service/internal/usecase"
@@ -25,14 +26,21 @@ func main() {
 		log.Fatalf("Error creating elastic client: %s", err)
 	}
 
-	repo := elasticsearch.NewRestaurantRepository(client, "restaurants")
-	searchUseCase := usecase.NewSearchRestaurantsUseCase(repo)
-	getMenuUseCase := usecase.NewGetRestaurantMenuUseCase(repo)
-	handler := http.NewRestaurantHandler(searchUseCase, getMenuUseCase)
+	repo := elasticsearch.NewRestaurantRepository(client, domain.ElasticIndexRestaurants)
+	
+	searchUC := usecase.NewSearchRestaurantsUseCase(repo)
+	getMenuUC := usecase.NewGetRestaurantMenuUseCase(repo)
+	saveUC := usecase.NewSaveRestaurantUseCase(repo)
+	handler := http.NewRestaurantHandler(searchUC, getMenuUC, saveUC)
 
 	r := gin.Default()
-	r.GET("/api/v1/restaurants", handler.Search)
-	r.GET("/api/v1/restaurants/:id/menu", handler.GetMenu)
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET("/restaurants", handler.Search)
+		v1.GET("/restaurants/:id/menu", handler.GetMenu)
+		v1.POST("/restaurants", handler.Save) // Internal/Seeding endpoint
+	}
+	
 	r.GET("/health", func(c *gin.Context) {
 		c.Status(200)
 	})

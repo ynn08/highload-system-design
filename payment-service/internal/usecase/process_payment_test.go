@@ -21,7 +21,7 @@ func (m *mockRepo) GetByIdempotencyKey(ctx context.Context, key string) (*domain
 
 type mockPublisher struct{}
 
-func (m *mockPublisher) PublishPaymentProcessed(ctx context.Context, orderID string, status string) error {
+func (m *mockPublisher) PublishPaymentProcessed(ctx context.Context, orderID string, restaurantID string, status string) error {
 	return nil
 }
 
@@ -40,9 +40,10 @@ func TestProcessPaymentUseCase_Idempotency(t *testing.T) {
 	uc := NewProcessPaymentUseCase(repo, pub, gw)
 
 	orderID := "order-1"
+	restaurantID := "rest-1"
 	
 	// First call
-	err := uc.Execute(context.Background(), orderID, 100.0)
+	err := uc.Execute(context.Background(), orderID, restaurantID, 100.0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +53,7 @@ func TestProcessPaymentUseCase_Idempotency(t *testing.T) {
 	}
 
 	// Second call with same orderID (idempotency key)
-	err = uc.Execute(context.Background(), orderID, 100.0)
+	err = uc.Execute(context.Background(), orderID, restaurantID, 100.0)
 	if err != nil {
 		t.Fatal(err)
 	}

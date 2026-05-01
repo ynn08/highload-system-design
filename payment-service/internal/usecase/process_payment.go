@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/user/highload-system-design/payment-service/internal/domain"
-	"log"
-	"time"
 )
 
 type ProcessPaymentUseCase struct {
@@ -19,11 +19,9 @@ func NewProcessPaymentUseCase(repo domain.PaymentRepository, publisher domain.Me
 }
 
 func (u *ProcessPaymentUseCase) Execute(ctx context.Context, orderID string, restaurantID string, amount float64) error {
-	// Non-trivial logic: Idempotency check
-	// Using orderID as idempotency key for this demo
+	// Idempotency check
 	existing, err := u.repo.GetByIdempotencyKey(ctx, orderID)
 	if err == nil && existing != nil {
-		log.Printf("Payment for order %s already processed with status %s", orderID, existing.Status)
 		return u.publisher.PublishPaymentProcessed(ctx, orderID, restaurantID, string(existing.Status))
 	}
 
