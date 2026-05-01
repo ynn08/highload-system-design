@@ -1,0 +1,42 @@
+C4Container
+  title Container Diagram - Food Delivery Platform
+
+  %% АКТОРЫ И ВНЕШНИЕ СИСТЕМЫ
+  Person(customer, "Клиент", "Ищет еду, оформляет заказы")
+  Person(courier, "Курьер", "Доставляет заказы, транслирует геолокацию")
+  System_Ext(payment_gateway, "Payment Gateway", "Stripe / CloudPayments")
+
+  System_Boundary(backend, "Food Delivery Backend") {
+    
+    Container(api_gw, "API Gateway", "Nginx / Kong", "Единая точка входа, rate-limiting, аутентификация")
+    
+    Container(catalog_svc, "Catalog Service", "Golang", "Поиск ресторанов и отдача меню")
+    Container(order_svc, "Order Service", "Java / Spring Boot", "Оркестрация заказов (Saga pattern)")
+    Container(payment_svc, "Payment Service", "Golang", "Абстракция над платежным шлюзом")
+    Container(delivery_svc, "Delivery Service", "Node.js", "Трекинг курьеров в реальном времени")
+
+    ContainerDb(kafka, "Message Broker", "Apache Kafka", "Асинхронная шина событий (Event Bus)")
+    ContainerDb(redis, "In-Memory Cache", "Redis", "Корзины пользователей, кэш каталога")
+    ContainerDb(postgres, "Relational DBs", "PostgreSQL", "БД микросервисов (Orders, Payments)")
+    ContainerDb(elastic, "Search Engine", "Elasticsearch", "Поисковый индекс, гео-поиск")
+  }
+
+  Rel(customer, api_gw, "Ищет еду, управляет заказом", "HTTPS / REST")
+  Rel(courier, api_gw, "Транслирует GPS, обновляет статус", "WSS / HTTPS")
+
+  Rel(api_gw, catalog_svc, "Запрашивает меню", "HTTP")
+  Rel(api_gw, order_svc, "Создает/отменяет заказы", "HTTP")
+  Rel(api_gw, delivery_svc, "Держит WebSocket соединение", "WSS")
+
+  Rel(catalog_svc, elastic, "Ищет рестораны", "TCP")
+  Rel(catalog_svc, redis, "Читает кэш меню", "TCP")
+
+  Rel(order_svc, postgres, "Читает/пишет состояние заказа", "TCP")
+  Rel(order_svc, redis, "Управляет корзиной", "TCP")
+  Rel(order_svc, kafka, "Публикует: OrderCreated", "TCP")
+
+  Rel(payment_svc, kafka, "Читает/пишет события оплаты", "TCP")
+  Rel(payment_svc, postgres, "Хранит статусы транзакций", "TCP")
+  Rel(payment_svc, payment_gateway, "Инициирует списание средств", "HTTPS")
+
+  Rel(delivery_svc, kafka, "Читает/пишет события доставки", "TCP")

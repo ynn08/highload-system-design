@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    participant Client as Клиент
+    participant OS as Order Service
+    participant DB as Postgres (Orders)
+    participant Kafka as Message Broker
+    participant PS as Payment Service
+    participant ExtPay as Payment Gateway
+    participant Notif as Notification Service
+
+    Note over OS, ExtPay: Предполагаем, что событие [OrderCreated] уже в Kafka
+
+    Kafka-->>PS: Consume Event:[OrderCreated]
+    PS->>ExtPay: POST /charge (Списание средств)
+    
+    ExtPay--xPS: Ошибка 503 Service Unavailable / Timeout
+    
+    Note over PS, ExtPay: PS может сделать 2-3 попытки (Retry). Если безуспешно:
+    
+    PS->>Kafka: Publish Event: [PaymentFailed]
+    
+    Kafka-->>OS: Consume Event: [PaymentFailed]
+    Note over OS, DB: Компенсирующая транзакция (Saga)
+    OS->>DB: Обновить статус заказа (Status: CANCELLED)
+    OS->>Kafka: Publish Event: [OrderCancelled]
+    
+    Kafka-->>Notif: Consume Event: [OrderCancelled]
+    Notif->>Client: Push-уведомление ("Оплата не удалась, заказ отменен")

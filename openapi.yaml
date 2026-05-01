@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Food Delivery Platform API
+  description: >
+    API сервиса доставки еды. 
+    **Подход к версионированию:** Используется URI Versioning. Все пути начинаются с префикса `/api/v1/`.
+  version: 1.0.0
+servers:
+  - url: https://api.delivery-platform.com
+    description: Production server
+
+paths:
+  /api/v1/restaurants:
+    get:
+      summary: Поиск ресторанов
+      description: Получение списка ресторанов с поддержкой полнотекстового поиска, фильтрации по кухне и гео-поиска (ФТ-001).
+      tags:
+        - Catalog
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          description: Широта пользователя
+          schema:
+            type: number
+            format: float
+            example: 55.75
+        - name: lon
+          in: query
+          required: true
+          description: Долгота пользователя
+          schema:
+            type: number
+            format: float
+            example: 37.62
+        - name: radius
+          in: query
+          required: false
+          description: Радиус поиска в метрах
+          schema:
+            type: integer
+            default: 5000
+        - name: cuisine
+          in: query
+          required: false
+          description: Фильтр по кухне
+          schema:
+            type: string
+            example: burger
+      responses:
+        '200':
+          description: Успешный поиск
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantListResponse'
+        '400':
+          description: Не переданы обязательные координаты
+        '429':
+          description: Rate limit exceeded
+        '500':
+          description: Внутренняя ошибка сервера (отказ поискового движка)
+
+  /api/v1/orders:
+    post:
+      summary: Оформление нового заказа
+      description: Создание заказа на основе собранной корзины (ФТ-004).
+      tags:
+        - Orders
+      security:
+        - bearerAuth:[]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Заказ успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+        '400':
+          description: Невалидные данные (пустая корзина, неверный формат адреса)
+        '401':
+          description: Пользователь не авторизован (отсутствует или просрочен JWT)
+        '404':
+          description: Ресторан или блюдо из корзины не найдено
+        '503':
+          description: Сервис временно недоступен
+
+  /api/v1/orders/{order_id}/status:
+    get:
+      summary: Получение статуса заказа
+      description: Запрос текущего статуса заказа и местоположения курьера (ФТ-005).
+      tags:
+        - Orders
+      security:
+        - bearerAuth:[]
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: UUID заказа
+          schema:
+            type: string
+            format: uuid
+            example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+      responses:
+        '200':
+          description: Текущий статус заказа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusResponse'
+        '401':
+          description: Пользователь не авторизован
+        '403':
+          description: Доступ запрещен (попытка запросить статус чужого заказа)
+        '404':
+          description: Заказ не найден
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RestaurantListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              restaurant_id:
+                type: string
+                format: uuid
+                example: 550e8400-e29b-41d4-a716-446655440000
+              name:
+                type: string
+                example: Burger Heroes
+              rating:
+                type: number
+                format: float
+                example: 4.8
+              distance_meters:
+                type: integer
+                example: 1200
+              cuisines:
+                type: array
+                items:
+                  type: string
+                example: ["American", "Burgers"]
+        total:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        offset:
+          type: integer
+          example: 0
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - restaurant_id
+        - items
+        - delivery_address
+      properties:
+        restaurant_id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              menu_item_id:
+                type: string
+                format: uuid
+                example: a1b2c3d4-1234-5678-90ab-cdef12345678
+              quantity:
+                type: integer
+                example: 2
+        delivery_address:
+          type: object
+          properties:
+            lat:
+              type: number
+              format: float
+              example: 55.7558
+            lon:
+              type: number
+              format: float
+              example: 37.6173
+            street:
+              type: string
+              example: ул. Тверская, 1
+            comment:
+              type: string
+              example: Оставить у двери
+        payment_method_id:
+          type: string
+          example: pm_192837465
+
+    CreateOrderResponse:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        status:
+          type: string
+          example: PENDING
+        total_amount:
+          type: number
+          format: float
+          example: 1550.00
+        estimated_delivery:
+          type: string
+          format: date-time
+          example: 2026-04-24T20:30:00Z
+
+    OrderStatusResponse:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        status:
+          type: string
+          example: DELIVERING
+        status_updated_at:
+          type: string
+          format: date-time
+          example: 2026-04-24T20:05:12Z
+        courier:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Иван
+            phone:
+              type: string
+              example: "+7-999-000-11-22"
+            location:
+              type: object
+              properties:
+                lat:
+                  type: number
+                  format: float
+                  example: 55.7530
+                lon:
+                  type: number
+                  format: float
+                  example: 37.6200
