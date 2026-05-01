@@ -8,13 +8,12 @@ C4Container
 
   System_Boundary(backend, "Food Delivery Backend") {
     
-    Container(api_gw, "API Gateway", "Nginx / Kong", "Единая точка входа, rate-limiting, аутентификация")
-    
-    Container(catalog_svc, "Catalog Service", "Golang", "Поиск ресторанов и отдача меню")
-    Container(order_svc, "Order Service", "Java / Spring Boot", "Оркестрация заказов (Saga pattern)")
-    Container(payment_svc, "Payment Service", "Golang", "Абстракция над платежным шлюзом")
-    Container(delivery_svc, "Delivery Service", "Node.js", "Трекинг курьеров в реальном времени")
+    Container(api_gw, "API Gateway", "Golang", "Единая точка входа, rate-limiting, аутентификация")
 
+    Container(catalog_svc, "Catalog Service", "Golang", "Поиск ресторанов и отдача меню")
+    Container(order_svc, "Order Service", "Golang", "Оркестрация заказов (Saga pattern, Outbox)")
+    Container(payment_svc, "Payment Service", "Golang", "Абстракция над платежным шлюзом")
+    Container(delivery_svc, "Delivery Service", "Golang", "Трекинг курьеров в реальном времени")
     ContainerDb(kafka, "Message Broker", "Apache Kafka", "Асинхронная шина событий (Event Bus)")
     ContainerDb(redis, "In-Memory Cache", "Redis", "Корзины пользователей, кэш каталога")
     ContainerDb(postgres, "Relational DBs", "PostgreSQL", "БД микросервисов (Orders, Payments)")
