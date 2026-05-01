@@ -1,45 +1,111 @@
 # Food Delivery Platform
 
-Микросервисная платформа доставки еды, спроектированная для высоких нагрузок. Проект написан на **Go (1.24)** и реализует асинхронное взаимодействие сервисов через Kafka с применением паттерна Saga. В основе архитектуры каждого сервиса лежит Clean Architecture.
+Микросервисная платформа доставки еды. 
+Стек: Go 1.24, PostgreSQL, Redis, Elasticsearch, Kafka.
+Архитектура: Clean Architecture, Event-Driven (Saga, Outbox).
 
-## Архитектура и стек
+Проект адаптирован под Задание 3 (PoC, оптимизация под лимиты 2 vCPU / 8 GB RAM).
 
-Платформа состоит из 5 независимых микросервисов:
+## Структура проекта
 
-*   **API Gateway (Go):** Единая точка входа. Отвечает за обратный прокси (Reverse Proxy), Rate Limiting (Token Bucket) и проверку авторизации.
-*   **Catalog Service (Go + Elasticsearch):** Управление ресторанами и меню. Elasticsearch используется для геопоиска и фильтрации.
-*   **Order Service (Go + PostgreSQL + Redis):** Оркестрация заказов. Корзины хранятся в Redis. Реализован **Transactional Outbox**, гарантирующий доставку событий в Kafka без двухфазных коммитов. Встроено динамическое ценообразование (Surge Pricing) в зависимости от нагрузки.
-*   **Payment Service (Go + PostgreSQL):** Процессинг платежей с механизмом **идемпотентности**, защищающим от двойных списаний при дублировании сообщений в брокере.
-*   **Delivery Service (Go):** Управление курьерами. Содержит алгоритм **Courier Batching** — умное распределение нескольких попутных заказов на одного курьера для оптимизации логистики.
+*   `api-gateway` — точка входа, rate limiting, auth middleware, reverse proxy.
+*   `catalog-service` — геопоиск ресторанов и отдача меню (Elasticsearch).
+*   `order-service` — процессинг корзины (Redis) и заказов (PostgreSQL). Реализует Outbox для отправки событий в Kafka.
+*   `payment-service` — эмуляция оплаты, проверка идемпотентности по ключу (PostgreSQL).
+*   `delivery-service` — трекинг доставки, алгоритм батчинга курьеров (In-Memory/Kafka).
 
-**Инфраструктура:** Docker Compose, PostgreSQL (с автомиграциями `golang-migrate`), Redis, Elasticsearch, Apache Kafka (KRaft).
+## Запуск
 
-## Быстрый старт
-
-Требования: Docker, Docker Compose, bash/curl (для прогона тестов).
-
-1. **Запуск инфраструктуры и сервисов:**
+1. Поднять инфраструктуру и приложения (лимиты ресурсов прописаны в `docker-compose.yml`):
    ```bash
    docker-compose up -d --build
    ```
-   *Контейнеры приложений ждут готовности баз данных (healthchecks) перед стартом и применением миграций.*
-
-2. **Инициализация тестовых данных:**
-   Скрипт наполнит БД и Elasticsearch тестовыми ресторанами, меню и курьерами через эндпоинты Gateway.
+2. Дождаться готовности (Postgres healthcheck). Проверить доступность шлюза:
+   ```bash
+   curl http://localhost:8080/health
+   ```
+3. Инициализировать БД и поисковый индекс тестовыми данными:
    ```bash
    chmod +x scripts/*.sh
    ./scripts/seed.sh
    ```
 
-3. **Сквозное тестирование (E2E):**
-   Скрипт эмулирует полный флоу пользователя: поиск ближайшего ресторана -> просмотр меню -> добавление в корзину -> создание заказа -> оплата (Saga) -> назначение курьера.
-   ```bash
-   ./scripts/test_flow.sh
-   ```
+## Проверка API (Happy Path)
 
-## Наблюдение
+Примеры curl-запросов к API Gateway:
 
-Проследить за прохождением асинхронных сообщений (Outbox -> Kafka -> Payment -> Delivery) можно в логах:
+Поиск ресторанов (Geo-query):
 ```bash
-docker-compose logs -f
+curl -s "http://localhost:8080/api/v1/restaurants?lat=55.75&lon=37.62&radius=5000"
 ```
+
+Меню ресторана:
+```bash
+curl -s "http://localhost:8080/api/v1/restaurants/00000000-0000-0000-0000-000000000001/menu"
+```
+
+Добавление в корзину:
+```bash
+curl -X POST "http://localhost:8080/api/v1/carts/550e8400-e29b-41d4-a716-446655440000?restaurantId=00000000-0000-0000-0000-000000000001" \
+     -H "Content-Type: application/json" \
+     -d '{"menu_item_id": "00000000-0000-0000-0000-000000000101", "quantity": 2}'
+```
+
+Создание заказа (запускает Saga, возвращает order_id):
+```bash
+curl -X POST "http://localhost:8080/api/v1/orders" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "customer_id": "550e8400-e29b-41d4-a716-446655440000",
+       "restaurant_id": "00000000-0000-0000-0000-000000000001",
+       "delivery_address": "Red Square, 1",
+       "items": [{"menu_item_id": "00000000-0000-0000-0000-000000000101", "quantity": 2, "price": 300}]
+     }'
+```
+
+Статус заказа (проверка назначения курьера после прохождения Saga):
+```bash
+curl -s "http://localhost:8080/api/v1/orders/<ORDER_ID>/status"
+```
+
+Автоматизированный прогон флоу:
+```bash
+./scripts/test_flow.sh
+```
+
+## Нагрузочное тестирование
+
+Нагрузочный тест написан на k6 и эмулирует смешанный профиль трафика (Read/Write).
+Запускать с отдельной машины, указав IP сервера в переменной `BASE_URL` внутри `loadtest/k6-script.js`.
+
+Запуск:
+```bash
+k6 run loadtest/k6-script.js
+```
+
+Метрики:
+- RED-метрики (latency, error rate, RPS) выводятся в консоль k6.
+- USE-метрики сервера (CPU/RAM/IO) контролируются через `docker stats`, `htop`, `iostat -dx 1`.
+
+## Паттерны
+
+### Проектирование
+1. **API Gateway:** Единая точка входа, скрывающая топологию сети. Включает rate limiting.
+   Код: [`api-gateway/main.go`](./api-gateway/main.go)
+2. **Transactional Outbox:** Исключает проблему Dual-Write при сохранении заказа и отправке события. Транзакция БД фиксирует заказ и event, после чего воркер доставляет event в Kafka.
+   Код: [`order-service/internal/usecase/create_order.go`](./order-service/internal/usecase/create_order.go) (запись) и [`order-service/internal/infrastructure/messaging/outbox_processor.go`](./order-service/internal/infrastructure/messaging/outbox_processor.go) (воркер).
+3. **Saga (Choreography/Orchestration):** Асинхронное выполнение транзакции заказа.
+   Код: [`delivery-service/main.go`](./delivery-service/main.go) (обработка события оплаты и запуск доставки).
+
+### Устойчивость (Resilience)
+1. **Rate Limiting:** Защита от спайков трафика (алгоритм Token Bucket).
+   Код: [`api-gateway/main.go`](./api-gateway/main.go) (Middleware `rateLimitMiddleware`).
+2. **Idempotency:** Защита от дублей доставки сообщений (At-Least-Once) со стороны Kafka, предотвращение повторного списания средств.
+   Код: [`payment-service/internal/usecase/process_payment.go`](./payment-service/internal/usecase/process_payment.go).
+3. **Health Check Dependency:** Контейнеры ожидают перехода базы данных в статус healthy (утилита `pg_isready`) перед стартом.
+   Код: [`docker-compose.yml`](./docker-compose.yml) (блок `healthcheck` и `depends_on`).
+
+## Журнал оптимизаций
+
+Логирование итераций тестирования и выявления bottlenecks: 
+**[docs/optimization-log.md](./docs/optimization-log.md)**

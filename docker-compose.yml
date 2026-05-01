@@ -16,11 +16,21 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 1G
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 512M
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
@@ -30,6 +40,11 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - "9200:9200"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 2G
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -53,6 +68,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       CLUSTER_ID: 'MkU3MzY1ODZ3N2FjMTA4OD'
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 1G
 
   gateway:
     build: ./api-gateway
@@ -67,6 +87,11 @@ services:
       - order-service
       - payment-service
       - delivery-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
 
   catalog-service:
     build: ./catalog-service
@@ -76,6 +101,11 @@ services:
     depends_on:
       - elasticsearch
       - redis
+    deploy:
+      resources:
+        limits:
+          cpus: "0.15"
+          memory: 256M
 
   order-service:
     build: ./order-service
@@ -90,6 +120,11 @@ services:
         condition: service_started
       redis:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "0.15"
+          memory: 256M
 
   payment-service:
     build: ./payment-service
@@ -101,6 +136,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "0.15"
+          memory: 256M
 
   delivery-service:
     build: ./delivery-service
@@ -108,3 +148,8 @@ services:
       - KAFKA_BROKERS=${KAFKA_BROKERS}
     depends_on:
       - kafka
+    deploy:
+      resources:
+        limits:
+          cpus: "0.15"
+          memory: 256M
