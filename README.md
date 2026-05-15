@@ -109,3 +109,7 @@ k6 run loadtest/k6-script.js
 
 Логирование итераций тестирования и выявления bottlenecks: 
 **[docs/optimization-log.md](./docs/optimization-log.md)**
+
+## Deployment Document
+
+Документация: **[docs/operations.md](./docs/operations.md)**
