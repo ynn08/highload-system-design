@@ -4,8 +4,6 @@
 Стек: Go 1.24, PostgreSQL, Redis, Elasticsearch, Kafka.
 Архитектура: Clean Architecture, Event-Driven (Saga, Outbox).
 
-Проект адаптирован под Задание 3 (PoC, оптимизация под лимиты 2 vCPU / 8 GB RAM).
-
 ## Структура проекта
 
 *   `api-gateway` — точка входа, rate limiting, auth middleware, reverse proxy.
@@ -109,3 +107,7 @@ k6 run loadtest/k6-script.js
 
 Логирование итераций тестирования и выявления bottlenecks: 
 **[docs/optimization-log.md](./docs/optimization-log.md)**
+
+## Deployment Document
+
+Документация: **[docs/operations.md](./docs/operations.md)**

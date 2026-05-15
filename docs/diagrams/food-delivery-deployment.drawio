@@ -1,0 +1,221 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="food-delivery-deployment" name="Food Delivery Deployment">
+    <mxGraphModel dx="1885" dy="1001" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=24;fontStyle=1" value="Food Delivery Platform - Deployment Diagram (Yandex Cloud, 3 AZ)" vertex="1">
+          <mxGeometry height="40" width="850" x="360" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="users" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=14" value="Users / Mobile Web" vertex="1">
+          <mxGeometry height="60" width="150" x="270" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13" value="Application Load Balancer&lt;br&gt;public :443&lt;br&gt;managed multi-AZ" vertex="1">
+          <mxGeometry height="90" width="190" x="250" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=10" value="VPC 10.0.0.0/16" vertex="1">
+          <mxGeometry height="780" width="920" x="490" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="az_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=8" value="ru-central1-a&lt;br&gt;public 10.0.1.0/24&lt;br&gt;app 10.0.11.0/24&lt;br&gt;data 10.0.21.0/24" vertex="1">
+          <mxGeometry height="690" width="270" x="520" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="az_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=8" value="ru-central1-b&lt;br&gt;public 10.0.2.0/24&lt;br&gt;app 10.0.12.0/24&lt;br&gt;data 10.0.22.0/24" vertex="1">
+          <mxGeometry height="690" width="270" x="815" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="az_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=8" value="ru-central1-d&lt;br&gt;public 10.0.3.0/24&lt;br&gt;app 10.0.13.0/24&lt;br&gt;data 10.0.23.0/24" vertex="1">
+          <mxGeometry height="690" width="270" x="1110" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="API Gateway x2&lt;br&gt;:8080" vertex="1">
+          <mxGeometry height="55" width="200" x="555" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="cat_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Catalog Service x2&lt;br&gt;:8080" vertex="1">
+          <mxGeometry height="55" width="200" x="555" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ord_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Order Service x2&lt;br&gt;:8080" vertex="1">
+          <mxGeometry height="55" width="200" x="555" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Payment Service x1&lt;br&gt;Kafka consumer" vertex="1">
+          <mxGeometry height="55" width="200" x="555" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="del_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Delivery Service x1&lt;br&gt;:8080 + consumer" vertex="1">
+          <mxGeometry height="55" width="200" x="555" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="data_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" value="PostgreSQL host :5432&lt;br&gt;Redis/Valkey :6379&lt;br&gt;Kafka broker :9092&lt;br&gt;OpenSearch :9200" vertex="1">
+          <mxGeometry height="110" width="200" x="555" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="API Gateway x2" vertex="1">
+          <mxGeometry height="55" width="200" x="850" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="cat_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Catalog Service x2" vertex="1">
+          <mxGeometry height="55" width="200" x="850" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ord_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Order Service x2" vertex="1">
+          <mxGeometry height="55" width="200" x="850" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Payment Service x1" vertex="1">
+          <mxGeometry height="55" width="200" x="850" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="del_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Delivery Service x1" vertex="1">
+          <mxGeometry height="55" width="200" x="850" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="data_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" value="PostgreSQL replica&lt;br&gt;Redis/Valkey replica&lt;br&gt;Kafka broker&lt;br&gt;OpenSearch node" vertex="1">
+          <mxGeometry height="110" width="200" x="850" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="API Gateway x2" vertex="1">
+          <mxGeometry height="55" width="200" x="1145" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="cat_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Catalog Service x2" vertex="1">
+          <mxGeometry height="55" width="200" x="1145" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ord_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Order Service x2" vertex="1">
+          <mxGeometry height="55" width="200" x="1145" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Payment Service x1" vertex="1">
+          <mxGeometry height="55" width="200" x="1145" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="del_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366" value="Delivery Service x1" vertex="1">
+          <mxGeometry height="55" width="200" x="1145" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="data_d" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" value="PostgreSQL replica&lt;br&gt;Redis/Valkey replica&lt;br&gt;Kafka broker&lt;br&gt;OpenSearch node" vertex="1">
+          <mxGeometry height="110" width="200" x="1145" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="obs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#666666" value="Monitoring + Logging&lt;br&gt;metrics / logs / traces" vertex="1">
+          <mxGeometry height="70" width="230" x="610" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="backup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#666666" value="Object Storage&lt;br&gt;PITR / snapshots / backups" vertex="1">
+          <mxGeometry height="70" width="230" x="970" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="users" style="endArrow=block;html=1;rounded=0;strokeWidth=2" target="alb" value="HTTPS :443">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-1" edge="1" parent="1" source="alb" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gw_a" value="HTTP :8080">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="190" />
+            </Array>
+            <mxPoint x="480" y="180" as="sourcePoint" />
+            <mxPoint x="530" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-2" edge="1" parent="1" source="alb" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gw_b" value="HTTP :8080">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="100" />
+              <mxPoint x="770" y="120" />
+            </Array>
+            <mxPoint x="460" y="100" as="sourcePoint" />
+            <mxPoint x="675" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-3" edge="1" parent="1" source="alb" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gw_d" value="HTTP :8080">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="550" y="60" />
+              <mxPoint x="1070" y="70" />
+            </Array>
+            <mxPoint x="450" y="150" as="sourcePoint" />
+            <mxPoint x="960" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-5" edge="1" parent="1" source="gw_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="cat_a" value="&lt;font size=&quot;1&quot; style=&quot;background-color: light-dark(rgb(255, 255, 255), rgb(204, 204, 255));&quot;&gt;/restaurants, /menu :8080&lt;/font&gt;">
+          <mxGeometry height="50" relative="1" width="50" x="0.7123" y="42" as="geometry">
+            <mxPoint x="1" as="offset" />
+            <Array as="points">
+              <mxPoint x="520" y="290" />
+            </Array>
+            <mxPoint x="540" y="290" as="sourcePoint" />
+            <mxPoint x="755" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-6" edge="1" parent="1" source="gw_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ord_a" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;/cart, /orders :8080&lt;/font&gt;">
+          <mxGeometry height="50" relative="1" width="50" x="0.7288" y="-32" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="800" y="340" />
+            </Array>
+            <mxPoint x="780" y="260" as="sourcePoint" />
+            <mxPoint x="995" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-7" edge="1" parent="1" source="gw_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=9;" target="del_a" value="/delivery/status :8080">
+          <mxGeometry height="50" relative="1" width="50" x="0.8325" y="23" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="480" y="270" />
+            </Array>
+            <mxPoint x="440" y="410" as="sourcePoint" />
+            <mxPoint x="655" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-8" edge="1" parent="1" source="cat_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=9;" target="data_a" value="/search/menu index :9200">
+          <mxGeometry height="50" relative="1" width="50" x="0.6528" y="22" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="460" y="520" />
+            </Array>
+            <mxPoint x="440" y="430" as="sourcePoint" />
+            <mxPoint x="655" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-9" edge="1" parent="1" source="ord_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=9;" target="data_a" value="orders/outbox :5432&lt;br&gt;carts/TTL :6379">
+          <mxGeometry height="50" relative="1" width="50" x="0.6022" y="6" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="420" y="640" />
+            </Array>
+            <mxPoint x="540" y="427" as="sourcePoint" />
+            <mxPoint x="540" y="673.25" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-11" edge="1" parent="1" source="ord_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontSize=9;dashed=1;dashPattern=8 8;" target="data_a" value="publish order-created :9092&lt;br&gt;consume payment-processed :9092">
+          <mxGeometry height="50" relative="1" width="50" x="0.31" y="-36" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="790" y="610" />
+            </Array>
+            <mxPoint x="770" y="430" as="sourcePoint" />
+            <mxPoint x="985" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-12" edge="1" parent="1" source="pay_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fontSize=9;dashed=1;dashPattern=8 8;" target="data_a" value="consume order-created :9092&lt;br&gt;publish order-processed :9092">
+          <mxGeometry height="50" relative="1" width="50" x="0.7462" y="-6" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="950" y="780" />
+            </Array>
+            <mxPoint x="762.4000000000002" y="520" as="sourcePoint" />
+            <mxPoint x="759.9999999999999" y="777.55" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-16" edge="1" parent="1" source="del_a" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.318;entryY=0.024;entryDx=0;entryDy=0;fontSize=9;dashed=1;dashPattern=8 8;entryPerimeter=0;" target="data_a" value="consume payment-processed :9092">
+          <mxGeometry height="50" relative="1" width="50" x="0.4492" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="620" y="630" />
+            </Array>
+            <mxPoint x="800" y="510" as="sourcePoint" />
+            <mxPoint x="800" y="812" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-18" edge="1" parent="1" source="vpc" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.341;entryY=0.024;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;dashPattern=1 4;" target="obs" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="790" y="870" />
+            </Array>
+            <mxPoint x="740" y="800" as="sourcePoint" />
+            <mxPoint x="790" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dKTwQlCU91Je5CL9NqrW-19" edge="1" parent="1" source="vpc" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=1 4;" target="backup" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="960" y="880" />
+            </Array>
+            <mxPoint x="1202" y="870" as="sourcePoint" />
+            <mxPoint x="940" y="912" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
