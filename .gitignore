@@ -1,0 +1,28 @@
+# .gitignore for the whole monorepo
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go
+bin/
+pkg/
+vendor/
+catalog-service/main
+api-gateway/main
+payment-service/main
+delivery-service/main
+order-service/main
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Docker
+.docker/

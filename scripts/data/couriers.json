@@ -1,0 +1,5 @@
+[
+  { "id": "1", "name": "Ivan", "location": { "lat": 55.75, "lon": 37.62 }, "is_available": true },
+  { "id": "2", "name": "Petr", "location": { "lat": 55.80, "lon": 37.70 }, "is_available": true },
+  { "id": "3", "name": "Semen", "location": { "lat": 55.74, "lon": 37.61 }, "is_available": true }
+]
